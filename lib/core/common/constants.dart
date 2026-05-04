@@ -1,0 +1,1 @@
+const weekDayShortHanded = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
