@@ -1,3 +1,4 @@
+import 'package:cinch/components/shake_on_invalid.dart';
 import 'package:cinch/providers/add_transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,34 +12,40 @@ class TimePickerTrigger extends StatelessWidget {
     return Consumer<AddTransactionScreenProvider>(
       builder: (context, provider, _) {
         final selected = provider.selectedTime;
-        return Material(
-          color: theme.colorScheme.surface.withValues(alpha: 0.9),
-          elevation: 2,
-          borderRadius: BorderRadius.circular(12),
-          child: InkWell(
+        return ShakeOnInvalid(
+          isInvalid: provider.isFieldInvalid(
+            AddTransactionScreenProvider.fieldTime,
+          ),
+          errorTick: provider.errorTick,
+          child: Material(
+            color: theme.colorScheme.surface.withValues(alpha: 0.9),
+            elevation: 2,
             borderRadius: BorderRadius.circular(12),
-            onTap: () => _pickDateTime(context, provider),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 8,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.schedule_rounded,
-                    size: 18,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  if (selected != null) ...[
-                    const SizedBox(width: 6),
-                    Text(
-                      _formatDateTime(selected),
-                      style: theme.textTheme.bodyMedium,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () => _pickDateTime(context, provider),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.schedule_rounded,
+                      size: 18,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
+                    if (selected != null) ...[
+                      const SizedBox(width: 6),
+                      Text(
+                        _formatDateTime(selected),
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),

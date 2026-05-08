@@ -4,6 +4,7 @@ import 'package:cinch/components/plain_text_field.dart';
 import 'package:cinch/components/centered_growing_amount_field.dart';
 import 'package:cinch/components/location_picker_trigger.dart';
 import 'package:cinch/components/money_source_picker_trigger.dart';
+import 'package:cinch/components/shake_on_invalid.dart';
 import 'package:cinch/components/tag_picker_trigger.dart';
 import 'package:cinch/components/switcher.dart';
 import 'package:cinch/core/common/ui_state.dart';
@@ -82,95 +83,107 @@ class AddTransactionScreen extends StatelessWidget {
             Initial() => Container(),
             Error() => Container(),
             Success(:final data) => LayoutBuilder(
-              builder: (context, constraints) {
-                const outerPad = 16.0 * 2;
-                const columnSpacing = 16.0;
-                const belowCard = 64.0;
-                final cardH =
-                    (constraints.maxHeight - outerPad - columnSpacing - belowCard)
-                        .clamp(200.0, 500.0);
-                return SingleChildScrollView(
+              builder: (context, constraints) => AnimatedPadding(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.viewInsetsOf(context).bottom,
+                ),
+                child: SizedBox(
+                  height: constraints.maxHeight,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       spacing: 16,
                       children: [
-                        DottedBorder(
-                          options: RoundedRectDottedBorderOptions(
-                            radius: Radius.circular(16),
-                            strokeWidth: 3,
-                            color: Theme.of(context).colorScheme.primaryContainer,
-                            dashPattern: [5, 10],
-                            strokeCap: StrokeCap.round,
-                          ),
-                          child: Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadiusGeometry.circular(16),
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  width: double.infinity,
-                                  height: cardH,
-                                  child: (data.imagePath != null)
-                                      ? Image.file(
-                                          File(data.imagePath!),
-                                          fit: BoxFit.cover,
-                                          width: double.infinity,
-                                        )
-                                      : GestureDetector(
-                                          onTapDown: (details) async {
-                                            final image = await ImagePicker()
-                                                .pickImage(
-                                                  source: ImageSource.gallery,
-                                                );
-                                            if (image != null) {
-                                              if (!context.mounted) return;
-                                              value.setImagePath(image, context);
-                                            }
-                                          },
-                                          child: Text("Select an image"),
-                                        ),
-                                ),
+                        Expanded(
+                          child: ShakeOnInvalid(
+                            isInvalid: value.isFieldInvalid(
+                              AddTransactionScreenProvider.fieldImage,
+                            ),
+                            errorTick: value.errorTick,
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(16),
+                            ),
+                            child: DottedBorder(
+                              options: RoundedRectDottedBorderOptions(
+                                radius: Radius.circular(16),
+                                strokeWidth: 3,
+                                color: Theme.of(context).colorScheme.primaryContainer,
+                                dashPattern: [5, 10],
+                                strokeCap: StrokeCap.round,
                               ),
-                              Positioned(
-                                left: 0,
-                                right: 0,
-                                bottom: 8,
-                                child: CenteredGrowingAmountField(
-                                  controller: value.amountTextController,
-                                  isInvalid: value.isFieldInvalid(
-                                    AddTransactionScreenProvider.fieldAmount,
+                              child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadiusGeometry.circular(16),
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    child: (data.imagePath != null)
+                                        ? Image.file(
+                                            File(data.imagePath!),
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                          )
+                                        : GestureDetector(
+                                            onTapDown: (details) async {
+                                              final image = await ImagePicker()
+                                                  .pickImage(
+                                                    source: ImageSource.gallery,
+                                                  );
+                                              if (image != null) {
+                                                if (!context.mounted) return;
+                                                value.setImagePath(image, context);
+                                              }
+                                            },
+                                            child: Text("Select an image"),
+                                          ),
                                   ),
-                                  errorTick: value.errorTick,
                                 ),
-                              ),
-                              Positioned(
-                                top: 8,
-                                right: 8,
-                                child: Column(
-                                  spacing: 8,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    MoneySourcePickerTrigger(),
-                                    TagPickerTrigger(),
-                                  ],
+                                Positioned(
+                                  left: 0,
+                                  right: 0,
+                                  bottom: 8,
+                                  child: CenteredGrowingAmountField(
+                                    controller: value.amountTextController,
+                                    isInvalid: value.isFieldInvalid(
+                                      AddTransactionScreenProvider.fieldAmount,
+                                    ),
+                                    errorTick: value.errorTick,
+                                  ),
                                 ),
-                              ),
-                              Positioned(
-                                top: 8,
-                                left: 8,
-                                child: Column(
-                                  spacing: 8,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    TimePickerTrigger(),
-                                    LocationPickerTrigger(),
-                                  ],
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: Column(
+                                    spacing: 8,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      MoneySourcePickerTrigger(),
+                                      TagPickerTrigger(),
+                                    ],
+                                  ),
                                 ),
+                                Positioned(
+                                  top: 8,
+                                  left: 8,
+                                  child: Column(
+                                    spacing: 8,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TimePickerTrigger(),
+                                      LocationPickerTrigger(),
+                                    ],
+                                  ),
+                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
                         Switcher(
@@ -201,14 +214,22 @@ class AddTransactionScreen extends StatelessWidget {
                               icon: const Icon(Icons.check),
                               iconSize: 48,
                             ),
-                            IconButton(onPressed: () {}, icon: Icon(Icons.cancel)),
+                            IgnorePointer(
+                              child: Opacity(
+                                opacity: 0,
+                                child: IconButton(
+                                  onPressed: null,
+                                  icon: Icon(Icons.cancel),
+                                ),
+                              ),
+                            ),
                           ],
                         )
                       ],
                     ),
                   ),
-                );
-              },
+                ),
+              ),
             ),
           },
         ),

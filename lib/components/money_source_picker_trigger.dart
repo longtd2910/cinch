@@ -1,4 +1,3 @@
-import 'package:cinch/components/shake_on_invalid.dart';
 import 'package:cinch/providers/add_transaction_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,56 +11,50 @@ class MoneySourcePickerTrigger extends StatelessWidget {
     return Consumer<AddTransactionScreenProvider>(
       builder: (context, provider, _) {
         final selected = provider.selectedMoneySource;
-        return ShakeOnInvalid(
-          isInvalid: provider.isFieldInvalid(
-            AddTransactionScreenProvider.fieldMoneySource,
-          ),
-          errorTick: provider.errorTick,
-          child: Material(
-            color: theme.colorScheme.surface.withValues(alpha: 0.9),
-            elevation: 2,
+        return Material(
+          color: theme.colorScheme.surface.withValues(alpha: 0.9),
+          elevation: 2,
+          borderRadius: BorderRadius.circular(12),
+          child: InkWell(
             borderRadius: BorderRadius.circular(12),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () {
-                showModalBottomSheet<void>(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: theme.colorScheme.surface,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(16)),
-                  ),
-                  builder: (_) =>
-                      _MoneySourcePickSheetBody(provider: provider),
-                ).then((_) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  });
+            onTap: () {
+              showModalBottomSheet<void>(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: theme.colorScheme.surface,
+                shape: const RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                builder: (_) =>
+                    _MoneySourcePickSheetBody(provider: provider),
+              ).then((_) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  FocusManager.instance.primaryFocus?.unfocus();
                 });
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 8,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.account_balance_wallet_rounded,
-                      size: 18,
-                      color: theme.colorScheme.onSurfaceVariant,
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 8,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.account_balance_wallet_rounded,
+                    size: 18,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  if (selected != null) ...[
+                    const SizedBox(width: 6),
+                    Text(
+                      selected,
+                      style: theme.textTheme.bodyMedium,
                     ),
-                    if (selected != null) ...[
-                      const SizedBox(width: 6),
-                      Text(
-                        selected,
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                    ],
                   ],
-                ),
+                ],
               ),
             ),
           ),

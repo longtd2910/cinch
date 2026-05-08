@@ -19,9 +19,8 @@ class AddTransactionScreenState {
 
 class AddTransactionScreenProvider extends ChangeNotifier {
   static const fieldAmount = 'amount';
-  static const fieldLocation = 'location';
-  static const fieldMoneySource = 'moneySource';
-  static const fieldTag = 'tag';
+  static const fieldImage = 'image';
+  static const fieldTime = 'time';
 
   final amountTextController = TextEditingController();
   final noteTextController = TextEditingController();
@@ -74,7 +73,6 @@ class AddTransactionScreenProvider extends ChangeNotifier {
       _locationOptions.add(t);
     }
     _selectedLocation = t;
-    _invalidFields.remove(fieldLocation);
     notifyListeners();
     if (added) {
       await _locationStorage.save(_locationOptions);
@@ -89,7 +87,6 @@ class AddTransactionScreenProvider extends ChangeNotifier {
       _moneySourceOptions.add(t);
     }
     _selectedMoneySource = t;
-    _invalidFields.remove(fieldMoneySource);
     notifyListeners();
     if (added) {
       await _moneySourceStorage.save(_moneySourceOptions);
@@ -104,7 +101,6 @@ class AddTransactionScreenProvider extends ChangeNotifier {
       _tagOptions.add(t);
     }
     _selectedTag = t;
-    _invalidFields.remove(fieldTag);
     notifyListeners();
     if (added) {
       await _tagStorage.save(_tagOptions);
@@ -120,6 +116,9 @@ class AddTransactionScreenProvider extends ChangeNotifier {
   void setSelectedTime(DateTime? value) {
     if (_selectedTime == value) return;
     _selectedTime = value;
+    if (value != null) {
+      _invalidFields.remove(fieldTime);
+    }
     notifyListeners();
   }
 
@@ -190,17 +189,18 @@ class AddTransactionScreenProvider extends ChangeNotifier {
     final capturedAt = await readImageDateTimeFromBytes(bytes);
     if (capturedAt != null) {
       _selectedTime = capturedAt;
+      _invalidFields.remove(fieldTime);
     }
+    _invalidFields.remove(fieldImage);
     _state = Success(AddTransactionScreenState(imagePath: imagePath));
     notifyListeners();
   }
 
-  Set<String> _validate(int amount) {
+  Set<String> _validate(int amount, String? imagePath) {
     final missing = <String>{};
     if (amount <= 0) missing.add(fieldAmount);
-    if (_selectedLocation == null) missing.add(fieldLocation);
-    if (_selectedMoneySource == null) missing.add(fieldMoneySource);
-    if (_selectedTag == null) missing.add(fieldTag);
+    if (imagePath == null || imagePath.isEmpty) missing.add(fieldImage);
+    if (_selectedTime == null) missing.add(fieldTime);
     return missing;
   }
 
@@ -208,7 +208,11 @@ class AddTransactionScreenProvider extends ChangeNotifier {
     if (_isSubmitting) return false;
 
     final amount = parseMoneyFromCommas(amountTextController.text);
-    final missing = _validate(amount);
+    final currentState = _state is Success<AddTransactionScreenState>
+        ? (_state as Success<AddTransactionScreenState>).data
+        : initialScreenState;
+    final imagePath = currentState.imagePath;
+    final missing = _validate(amount, imagePath);
     _invalidFields
       ..clear()
       ..addAll(missing);
@@ -222,19 +226,16 @@ class AddTransactionScreenProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final currentState = _state is Success<AddTransactionScreenState>
-          ? (_state as Success<AddTransactionScreenState>).data
-          : initialScreenState;
       final now = DateTime.now();
       final transaction = Transaction(
-        time: _selectedTime ?? now,
+        time: _selectedTime!,
         amount: amount,
-        tags: [_selectedTag!],
+        tags: _selectedTag != null ? [_selectedTag!] : const [],
         note: noteTextController.text.trim(),
-        location: _selectedLocation!,
+        location: _selectedLocation ?? '',
         type: _isIncome,
-        source: _selectedMoneySource!,
-        imageUrl: currentState.imagePath ?? '',
+        source: _selectedMoneySource ?? '',
+        imageUrl: imagePath!,
         createdAt: now,
         updatedAt: now,
       );
