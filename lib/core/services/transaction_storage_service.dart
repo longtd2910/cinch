@@ -20,6 +20,10 @@ class TransactionStorageService {
     return _box.delete(key);
   }
 
+  Future<int> clear() {
+    return _box.clear();
+  }
+
   List<Transaction> loadAll() {
     return _box.values
         .map((raw) => Transaction.fromJson(Map<String, dynamic>.from(raw)))

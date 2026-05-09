@@ -109,78 +109,90 @@ class AddTransactionScreen extends StatelessWidget {
                               options: RoundedRectDottedBorderOptions(
                                 radius: Radius.circular(16),
                                 strokeWidth: 3,
-                                color: Theme.of(context).colorScheme.primaryContainer,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primaryContainer,
                                 dashPattern: [5, 10],
                                 strokeCap: StrokeCap.round,
                               ),
                               child: Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadiusGeometry.circular(16),
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    child: (data.imagePath != null)
-                                        ? Image.file(
-                                            File(data.imagePath!),
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                            height: double.infinity,
-                                          )
-                                        : GestureDetector(
-                                            onTapDown: (details) async {
-                                              final image = await ImagePicker()
-                                                  .pickImage(
-                                                    source: ImageSource.gallery,
-                                                  );
-                                              if (image != null) {
-                                                if (!context.mounted) return;
-                                                value.setImagePath(image, context);
-                                              }
-                                            },
-                                            child: Text("Select an image"),
-                                          ),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 0,
-                                  right: 0,
-                                  bottom: 8,
-                                  child: CenteredGrowingAmountField(
-                                    controller: value.amountTextController,
-                                    isInvalid: value.isFieldInvalid(
-                                      AddTransactionScreenProvider.fieldAmount,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadiusGeometry.circular(
+                                      16,
                                     ),
-                                    errorTick: value.errorTick,
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      child: (data.imagePath != null)
+                                          ? Image.file(
+                                              File(data.imagePath!),
+                                              fit: BoxFit.cover,
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                            )
+                                          : GestureDetector(
+                                              onTapDown: (details) async {
+                                                final image =
+                                                    await ImagePicker()
+                                                        .pickImage(
+                                                          source: ImageSource
+                                                              .gallery,
+                                                        );
+                                                if (image != null) {
+                                                  if (!context.mounted) return;
+                                                  value.setImagePath(
+                                                    image,
+                                                    context,
+                                                  );
+                                                }
+                                              },
+                                              child: Text("Select an image"),
+                                            ),
+                                    ),
                                   ),
-                                ),
-                                Positioned(
-                                  top: 8,
-                                  right: 8,
-                                  child: Column(
-                                    spacing: 8,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      MoneySourcePickerTrigger(),
-                                      TagPickerTrigger(),
-                                    ],
+                                  Positioned(
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 8,
+                                    child: CenteredGrowingAmountField(
+                                      controller: value.amountTextController,
+                                      isInvalid: value.isFieldInvalid(
+                                        AddTransactionScreenProvider
+                                            .fieldAmount,
+                                      ),
+                                      errorTick: value.errorTick,
+                                    ),
                                   ),
-                                ),
-                                Positioned(
-                                  top: 8,
-                                  left: 8,
-                                  child: Column(
-                                    spacing: 8,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TimePickerTrigger(),
-                                      LocationPickerTrigger(),
-                                    ],
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: Column(
+                                      spacing: 8,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        MoneySourcePickerTrigger(),
+                                        TagPickerTrigger(),
+                                      ],
+                                    ),
                                   ),
-                                ),
+                                  Positioned(
+                                    top: 8,
+                                    left: 8,
+                                    child: Column(
+                                      spacing: 8,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        TimePickerTrigger(),
+                                        LocationPickerTrigger(),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -200,7 +212,10 @@ class AddTransactionScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           spacing: 16,
                           children: [
-                            IconButton(onPressed: () {}, icon: Icon(Icons.cancel)),
+                            IconButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              icon: Icon(Icons.cancel),
+                            ),
                             IconButton.filledTonal(
                               onPressed: value.isSubmitting
                                   ? null
@@ -211,8 +226,11 @@ class AddTransactionScreen extends StatelessWidget {
                                         navigator.pop();
                                       }
                                     },
-                              icon: const Icon(Icons.check),
+                              icon: Icon(Icons.check),
                               iconSize: 48,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.primaryContainer,
                             ),
                             IgnorePointer(
                               child: Opacity(
@@ -224,7 +242,7 @@ class AddTransactionScreen extends StatelessWidget {
                               ),
                             ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),

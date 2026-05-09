@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:m3e_design/m3e_design.dart';
 
 import 'package:cinch/theme/obsidian_tokens.dart';
 
@@ -123,7 +124,7 @@ class AppTheme {
   static ThemeData get obsidian {
     final cs = colorScheme;
     final tt = textTheme(cs);
-    return ThemeData(
+    final base = ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: cs,
@@ -173,5 +174,6 @@ class AppTheme {
         ObsidianRadii.obsidian,
       ],
     );
+    return withM3ETheme(base);
   }
 }
