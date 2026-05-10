@@ -22,8 +22,12 @@ class CalendarDate extends StatelessWidget {
                 ? const SizedBox.shrink()
                 : Container(
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainer,
+                      color: Theme.of(context).colorScheme.primary.withAlpha(20),
                       borderRadius: BorderRadius.circular(8),
+                      border: BoxBorder.all(
+                        width: 1,
+                        color: Theme.of(context).colorScheme.primary.withAlpha(100)
+                      )
                     ),
                     child: Stack(
                       children: [
@@ -41,7 +45,7 @@ class CalendarDate extends StatelessWidget {
                           right: 6,
                           bottom: 4,
                           child: Text(
-                            '${data.month}/${data.day}',
+                            '${data.day}',
                             style: Theme.of(context).textTheme.labelSmall,
                           ),
                         ),

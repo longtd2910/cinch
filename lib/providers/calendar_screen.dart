@@ -1,9 +1,14 @@
-import 'package:cinch/core/common/ui_state.dart';
 import 'package:flutter/material.dart';
 
-class CalendarScreenState {}
+enum CalendarLayoutMode { calendar, day }
 
 class CalendarScreenProvider extends ChangeNotifier {
-  UIState<CalendarScreenState> _state = Initial();
-  UIState<CalendarScreenState> get state => _state;
+  CalendarLayoutMode _layoutMode = CalendarLayoutMode.calendar;
+  CalendarLayoutMode get layoutMode => _layoutMode;
+
+  void setLayoutMode(CalendarLayoutMode mode) {
+    if (_layoutMode == mode) return;
+    _layoutMode = mode;
+    notifyListeners();
+  }
 }
