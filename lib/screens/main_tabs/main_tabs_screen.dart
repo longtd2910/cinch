@@ -28,11 +28,11 @@ class _MainTabsScreenState extends State<MainTabsScreen> {
   ];
 
   int get _screenIndex => switch (_currentNavIndex) {
-        _calendarNavIndex => 0,
-        _transactionsNavIndex => 1,
-        _settingsNavIndex => 2,
-        _ => 0,
-      };
+    _calendarNavIndex => 0,
+    _transactionsNavIndex => 1,
+    _settingsNavIndex => 2,
+    _ => 0,
+  };
 
   Future<void> _onDestinationSelected(int index) async {
     if (index == _addNavIndex) {
@@ -53,7 +53,7 @@ class _MainTabsScreenState extends State<MainTabsScreen> {
     final addIcon = GestureDetector(
       behavior: HitTestBehavior.translucent,
       onLongPress: _onAddLongPress,
-      child: Icon(Icons.add_circle, color: cs.primaryContainer, size: 32),
+      child: Icon(Icons.add_circle, color: cs.primary, size: 32),
     );
 
     final destinations = <NavigationDestinationM3E>[
@@ -81,10 +81,7 @@ class _MainTabsScreenState extends State<MainTabsScreen> {
     ];
 
     return Scaffold(
-      body: IndexedStack(
-        index: _screenIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _screenIndex, children: _screens),
       bottomNavigationBar: NavigationBarM3E(
         selectedIndex: _currentNavIndex,
         onDestinationSelected: _onDestinationSelected,

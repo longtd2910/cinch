@@ -29,7 +29,7 @@ class _CenteredGrowingAmountFieldState
     return GoogleFonts.nunito(
       fontSize: 42,
       fontWeight: FontWeight.w600,
-      color: hasValue ? cs.primaryContainer : cs.onSurface,
+      color: hasValue ? cs.primary : cs.onSurface,
     );
   }
 
@@ -95,7 +95,7 @@ class _CenteredGrowingAmountFieldState
                   Icon(
                     Icons.attach_money,
                     size: 40,
-                    color: hasValue ? cs.primaryContainer : cs.onSurface,
+                    color: hasValue ? cs.primary : cs.onSurface,
                   ),
                   SizedBox(
                     width: _fieldWidth(context, constraints.maxWidth),

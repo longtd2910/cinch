@@ -44,8 +44,10 @@ class _SwitcherState extends State<Switcher> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(100),
                     color: (i == selectedIndex)
-                        ? (selectedIndex == 0) ? Theme.of(context).colorScheme.errorContainer : Theme.of(context).colorScheme.primaryContainer
-                        : Theme.of(context).colorScheme.secondaryContainer
+                        ? (selectedIndex == 0)
+                              ? Theme.of(context).colorScheme.errorContainer
+                              : Theme.of(context).colorScheme.tertiary
+                        : Theme.of(context).colorScheme.secondaryContainer,
                   ),
                   alignment: Alignment.center,
                   child: Text(
@@ -53,7 +55,9 @@ class _SwitcherState extends State<Switcher> {
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       color: (i == selectedIndex)
-                          ? (selectedIndex == 0) ? Theme.of(context).colorScheme.onErrorContainer : Theme.of(context).colorScheme.onPrimary
+                          ? (selectedIndex == 0)
+                                ? Theme.of(context).colorScheme.onErrorContainer
+                                : Theme.of(context).colorScheme.onTertiary
                           : Theme.of(context).colorScheme.secondary,
                     ),
                   ),

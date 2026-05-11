@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cinch/core/models/transaction.dart';
+import 'package:cinch/core/utils/money_format.dart';
 import 'package:cinch/core/services/transaction_storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -110,15 +111,42 @@ class CalendarDayTimeline extends StatelessWidget {
               ),
               itemCount: dayTx.length,
               itemBuilder: (context, i) {
-                final path = dayTx[i].imageUrl;
+                final tx = dayTx[i];
+                final path = tx.imageUrl;
                 return ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: Image.file(
-                    File(path),
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => ColoredBox(
-                      color: colorScheme.surfaceContainerHigh,
-                    ),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.file(
+                        File(path),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => ColoredBox(
+                          color: colorScheme.surfaceContainerHigh,
+                        ),
+                      ),
+                      Positioned(
+                        left: 4,
+                        bottom: 4,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.58),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            formatMoneyWithCommas(tx.amount.toString()),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },

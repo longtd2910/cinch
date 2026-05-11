@@ -24,39 +24,33 @@ class CalendarProvider extends ChangeNotifier {
   }
 
   void previousMonth() {
-    final currentState = _state;
-    if (currentState is! Success<CalendarState>) return;
-    final currentYear = currentState.data.selectedYear;
-    final currentMonth = currentState.data.selectedMonth;
-    if (currentMonth == 1) {
-      _setMonthYear(currentYear - 1, 12);
-      return;
-    }
-    _setMonthYear(currentYear, currentMonth - 1);
+    moveMonths(-1);
   }
 
   void nextMonth() {
+    moveMonths(1);
+  }
+
+  void moveMonths(int monthOffset) {
     final currentState = _state;
     if (currentState is! Success<CalendarState>) return;
-    final currentYear = currentState.data.selectedYear;
-    final currentMonth = currentState.data.selectedMonth;
-    if (currentMonth == 12) {
-      _setMonthYear(currentYear + 1, 1);
-      return;
-    }
-    _setMonthYear(currentYear, currentMonth + 1);
+    if (monthOffset == 0) return;
+    final selectedDate = DateTime(
+      currentState.data.selectedYear,
+      currentState.data.selectedMonth + monthOffset,
+    );
+    _setMonthYear(selectedDate.year, selectedDate.month);
+  }
+
+  List<int?> visibleDaySkeletonFor(int year, int month) {
+    return _buildVisibleDaySkeleton(year, month);
   }
 
   void _setMonthYear(int year, int month) {
     _visibleDaySkeleton
       ..clear()
       ..addAll(_buildVisibleDaySkeleton(year, month));
-    _state = Success(
-      CalendarState(
-        selectedMonth: month,
-        selectedYear: year,
-      ),
-    );
+    _state = Success(CalendarState(selectedMonth: month, selectedYear: year));
     notifyListeners();
   }
 

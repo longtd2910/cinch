@@ -70,7 +70,7 @@ class PlainTextField extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: cs.primaryContainer,
+        color: cs.surfaceContainer,
       ),
       child: TextField(
         controller: controller,
@@ -90,8 +90,7 @@ class PlainTextField extends StatelessWidget {
         autofocus: autofocus,
         onChanged: onChanged,
         onSubmitted: onSubmitted,
-        onTapOutside: (_) =>
-            FocusManager.instance.primaryFocus?.unfocus(),
+        onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         inputFormatters: inputFormatters,
         decoration: plainDecoration(merged),
       ),

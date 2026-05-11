@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:cinch/core/common/ui_state.dart';
 import 'package:cinch/core/models/transaction.dart';
@@ -20,37 +21,27 @@ class CalendarDate extends StatelessWidget {
           Success(:final data) =>
             data.day == null
                 ? const SizedBox.shrink()
-                : Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withAlpha(20),
-                      borderRadius: BorderRadius.circular(8),
-                      border: BoxBorder.all(
-                        width: 1,
-                        color: Theme.of(context).colorScheme.primary.withAlpha(100)
-                      )
-                    ),
-                    child: Stack(
-                      children: [
-                        if (data.dateTransactions.isNotEmpty)
-                          Positioned(
-                            top: 4,
-                            left: 4,
-                            right: 4,
-                            bottom: 16,
-                            child: _TransactionImageFan(
-                              transactions: data.dateTransactions,
-                            ),
-                          ),
+                : Stack(
+                    children: [
+                      if (data.dateTransactions.isNotEmpty)
                         Positioned(
-                          right: 6,
-                          bottom: 4,
-                          child: Text(
-                            '${data.day}',
-                            style: Theme.of(context).textTheme.labelSmall,
+                          top: 4,
+                          left: 4,
+                          right: 4,
+                          bottom: 16,
+                          child: _TransactionImageFan(
+                            transactions: data.dateTransactions,
                           ),
                         ),
-                      ],
-                    ),
+                      Positioned(
+                        right: 6,
+                        bottom: 4,
+                        child: Text(
+                          '${data.day}',
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                      ),
+                    ],
                   ),
         };
       },
@@ -70,8 +61,8 @@ class _TransactionImageFan extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final cardWidth = constraints.maxWidth * 0.6;
-        final cardHeight = constraints.maxHeight * 0.85;
+        final cardWidth = math.min(34.0, constraints.maxWidth * 0.7);
+        final cardHeight = math.min(48.0, constraints.maxHeight);
         final lateralOffset = cardWidth * 0.35;
         final overflowCount = transactions.length - visible.length;
         const tiltAngle = 0.22;

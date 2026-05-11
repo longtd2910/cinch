@@ -109,9 +109,7 @@ class AddTransactionScreen extends StatelessWidget {
                               options: RoundedRectDottedBorderOptions(
                                 radius: Radius.circular(16),
                                 strokeWidth: 3,
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.primaryContainer,
+                                color: Theme.of(context).colorScheme.primary,
                                 dashPattern: [5, 10],
                                 strokeCap: StrokeCap.round,
                               ),
@@ -228,9 +226,7 @@ class AddTransactionScreen extends StatelessWidget {
                                     },
                               icon: Icon(Icons.check),
                               iconSize: 48,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primaryContainer,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             IgnorePointer(
                               child: Opacity(

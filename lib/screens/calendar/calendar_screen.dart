@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:cinch/components/calendar.dart';
 import 'package:cinch/components/calendar_day_timeline.dart';
 import 'package:cinch/providers/calendar.dart';
 import 'package:cinch/providers/calendar_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CalendarScreen extends StatelessWidget {
   const CalendarScreen({super.key});
@@ -17,7 +17,7 @@ class CalendarScreen extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => CalendarProvider()),
         ],
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 16,
