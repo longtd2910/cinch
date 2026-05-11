@@ -135,7 +135,8 @@ class _MonthPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final transactions = context.read<TransactionStorageService>().loadAll();
+    final transactionStorage = context.watch<TransactionStorageService>();
+    final transactions = transactionStorage.loadAll();
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -179,7 +180,7 @@ class _MonthPage extends StatelessWidget {
             itemCount: days.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              childAspectRatio: 0.6,
+              childAspectRatio: 0.7,
             ),
             itemBuilder: (context, index) {
               final isLastColumn = (index + 1) % 7 == 0;
@@ -195,7 +196,9 @@ class _MonthPage extends StatelessWidget {
                   ),
                 ),
                 child: ChangeNotifierProvider(
-                  key: ValueKey('$year-$month-$index'),
+                  key: ValueKey(
+                    '$year-$month-$index-${transactionStorage.dataRevision}',
+                  ),
                   create: (_) => CalendarDateProvider(
                     day: days[index],
                     year: year,

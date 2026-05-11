@@ -29,7 +29,7 @@ Future<void> main() async {
           create: (_) => MoneySourceStorageService(),
         ),
         Provider<TagStorageService>(create: (_) => TagStorageService()),
-        Provider<TransactionStorageService>(
+        ChangeNotifierProvider<TransactionStorageService>(
           create: (_) => TransactionStorageService(
             Hive.box<Map>(TransactionStorageService.boxName),
           ),

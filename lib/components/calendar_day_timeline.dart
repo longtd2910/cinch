@@ -62,7 +62,8 @@ class CalendarDayTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final transactions = context.read<TransactionStorageService>().loadAll();
+    final transactionStorage = context.watch<TransactionStorageService>();
+    final transactions = transactionStorage.loadAll();
     final groups = _groupByDay(transactions);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;

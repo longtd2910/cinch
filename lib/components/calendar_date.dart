@@ -22,33 +22,44 @@ class CalendarDate extends StatelessWidget {
           Success(:final data) =>
             data.day == null
                 ? const SizedBox.shrink()
-                : Stack(
-                    children: [
-                      if (data.dateTransactions.isNotEmpty)
+                : DecoratedBox(
+                    decoration: data.isToday
+                        ? BoxDecoration(
+                            color: const Color(0xAAD9BC84),
+                            border: Border.all(
+                              color: const Color(0xFFD9BC84),
+                              width: 2,
+                            ),
+                          )
+                        : const BoxDecoration(),
+                    child: Stack(
+                      children: [
+                        if (data.dateTransactions.isNotEmpty)
+                          Positioned(
+                            top: 4,
+                            left: 4,
+                            right: 4,
+                            bottom: 22,
+                            child: _TransactionImageFan(
+                              transactions: data.dateTransactions,
+                            ),
+                          ),
+                        if (data.dateTransactions.isNotEmpty)
+                          Positioned(
+                            left: 4,
+                            bottom: 4,
+                            child: _DayTotalBadge(amount: data.netAmount),
+                          ),
                         Positioned(
-                          top: 4,
-                          left: 4,
-                          right: 4,
-                          bottom: 22,
-                          child: _TransactionImageFan(
-                            transactions: data.dateTransactions,
+                          right: 6,
+                          bottom: 4,
+                          child: Text(
+                            '${data.day}',
+                            style: Theme.of(context).textTheme.labelSmall,
                           ),
                         ),
-                      if (data.dateTransactions.isNotEmpty)
-                        Positioned(
-                          left: 4,
-                          bottom: 4,
-                          child: _DayTotalBadge(amount: data.netAmount),
-                        ),
-                      Positioned(
-                        right: 6,
-                        bottom: 4,
-                        child: Text(
-                          '${data.day}',
-                          style: Theme.of(context).textTheme.labelSmall,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
         };
       },
@@ -205,21 +216,26 @@ class _ImageCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final radius = BorderRadius.circular(6);
-    return Container(
+    return SizedBox(
       width: width,
       height: height,
-      padding: const EdgeInsets.all(2),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary,
-        borderRadius: radius,
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(4),
-        child: Image.file(
-          File(path),
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) =>
-              Container(color: colorScheme.surfaceContainerHigh),
+      child: Material(
+        elevation: 1,
+        color: const Color(0xFFE9E2D8),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: radius),
+        clipBehavior: Clip.antiAlias,
+        child: Padding(
+          padding: const EdgeInsets.all(2),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: Image.file(
+              File(path),
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  Container(color: colorScheme.surfaceContainerHigh),
+            ),
+          ),
         ),
       ),
     );

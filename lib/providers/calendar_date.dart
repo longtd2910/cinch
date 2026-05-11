@@ -6,6 +6,7 @@ class CalendarDateState {
   final int? day;
   final int month;
   final bool isRealDate;
+  final bool isToday;
   final List<Transaction> dateTransactions;
   final int netAmount;
 
@@ -13,6 +14,7 @@ class CalendarDateState {
     required this.day,
     required this.month,
     required this.isRealDate,
+    required this.isToday,
     required this.dateTransactions,
     required this.netAmount,
   });
@@ -30,11 +32,17 @@ class CalendarDateProvider extends ChangeNotifier {
   }) {
     final dateTransactions =
         _get_date_transactions(day, month, year, transactions);
+    final now = DateTime.now();
+    final isToday = day != null &&
+        year == now.year &&
+        month == now.month &&
+        day == now.day;
     _state = Success(
       CalendarDateState(
         day: day,
         month: month,
         isRealDate: day != null,
+        isToday: isToday,
         dateTransactions: dateTransactions,
         netAmount: _netAmount(dateTransactions),
       ),
