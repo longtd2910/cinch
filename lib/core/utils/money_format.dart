@@ -19,6 +19,27 @@ int parseMoneyFromCommas(String input) {
   return int.parse(digits);
 }
 
+String formatMoneyCompact(int amount) {
+  final abs = amount.abs();
+  if (abs < 1000) return abs.toString();
+  if (abs < 1000000) {
+    final value = abs / 1000;
+    return value < 10
+        ? '${value.toStringAsFixed(1)}k'
+        : '${value.round()}k';
+  }
+  if (abs < 1000000000) {
+    final value = abs / 1000000;
+    return value < 10
+        ? '${value.toStringAsFixed(1)}m'
+        : '${value.round()}m';
+  }
+  final value = abs / 1000000000;
+  return value < 10
+      ? '${value.toStringAsFixed(1)}b'
+      : '${value.round()}b';
+}
+
 class MoneyInputFormatter extends TextInputFormatter {
   const MoneyInputFormatter();
 

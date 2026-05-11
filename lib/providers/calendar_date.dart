@@ -7,12 +7,14 @@ class CalendarDateState {
   final int month;
   final bool isRealDate;
   final List<Transaction> dateTransactions;
+  final int netAmount;
 
   CalendarDateState({
     required this.day,
     required this.month,
     required this.isRealDate,
     required this.dateTransactions,
+    required this.netAmount,
   });
 }
 
@@ -34,6 +36,7 @@ class CalendarDateProvider extends ChangeNotifier {
         month: month,
         isRealDate: day != null,
         dateTransactions: dateTransactions,
+        netAmount: _netAmount(dateTransactions),
       ),
     );
   }
@@ -49,5 +52,13 @@ class CalendarDateProvider extends ChangeNotifier {
       final time = transaction.time;
       return time.year == year && time.month == month && time.day == day;
     }).toList();
+  }
+
+  int _netAmount(List<Transaction> transactions) {
+    var net = 0;
+    for (final transaction in transactions) {
+      net += transaction.type ? transaction.amount : -transaction.amount;
+    }
+    return net;
   }
 }
