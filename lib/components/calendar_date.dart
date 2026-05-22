@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:cinch/core/common/ui_state.dart';
 import 'package:cinch/core/models/transaction.dart';
 import 'package:cinch/core/utils/money_format.dart';
+import 'package:cinch/providers/calendar.dart';
 import 'package:cinch/providers/calendar_date.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,16 +23,34 @@ class CalendarDate extends StatelessWidget {
           Success(:final data) =>
             data.day == null
                 ? const SizedBox.shrink()
-                : DecoratedBox(
-                    decoration: data.isToday
-                        ? BoxDecoration(
-                            color: const Color(0xAAD9BC84),
-                            border: Border.all(
-                              color: const Color(0xFFD9BC84),
+                : GestureDetector(
+                    onTap: () {
+                      context.read<CalendarProvider>().selectDate(
+                            DateTime(data.year, data.month, data.day!),
+                          );
+                    },
+                    child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: data.isSelected
+                          ? Theme.of(context)
+                              .colorScheme
+                              .primaryContainer
+                              .withValues(alpha: 0.55)
+                          : data.isToday
+                              ? const Color(0xAAD9BC84)
+                              : null,
+                      border: data.isSelected
+                          ? Border.all(
+                              color: Theme.of(context).colorScheme.primary,
                               width: 2,
-                            ),
-                          )
-                        : const BoxDecoration(),
+                            )
+                          : data.isToday
+                              ? Border.all(
+                                  color: const Color(0xFFD9BC84),
+                                  width: 2,
+                                )
+                              : null,
+                    ),
                     child: Stack(
                       children: [
                         if (data.dateTransactions.isNotEmpty)
@@ -61,6 +80,7 @@ class CalendarDate extends StatelessWidget {
                       ],
                     ),
                   ),
+                ),
         };
       },
     );

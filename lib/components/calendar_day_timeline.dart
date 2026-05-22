@@ -7,7 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CalendarDayTimeline extends StatelessWidget {
-  const CalendarDayTimeline({super.key});
+  const CalendarDayTimeline({
+    super.key,
+    this.transactions,
+    this.emptyMessage = 'No transactions yet',
+  });
+
+  final List<Transaction>? transactions;
+  final String emptyMessage;
 
   static List<MapEntry<DateTime, List<Transaction>>> _groupByDay(
     List<Transaction> transactions,
@@ -63,15 +70,15 @@ class CalendarDayTimeline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final transactionStorage = context.watch<TransactionStorageService>();
-    final transactions = transactionStorage.loadAll();
-    final groups = _groupByDay(transactions);
+    final visibleTransactions = transactions ?? transactionStorage.loadAll();
+    final groups = _groupByDay(visibleTransactions);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     if (groups.isEmpty) {
       return Center(
         child: Text(
-          'No transactions yet',
+          emptyMessage,
           style: theme.textTheme.bodyLarge?.copyWith(
             color: colorScheme.onSurfaceVariant,
           ),
@@ -90,10 +97,7 @@ class CalendarDayTimeline extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.only(
-                top: index == 0 ? 0 : 20,
-                bottom: 10,
-              ),
+              padding: EdgeInsets.only(top: index == 0 ? 0 : 20, bottom: 10),
               child: Text(
                 _dayHeader(date),
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -122,9 +126,8 @@ class CalendarDayTimeline extends StatelessWidget {
                       Image.file(
                         File(path),
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => ColoredBox(
-                          color: colorScheme.surfaceContainerHigh,
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            ColoredBox(color: colorScheme.surfaceContainerHigh),
                       ),
                       Positioned(
                         left: 4,

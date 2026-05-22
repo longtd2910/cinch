@@ -4,8 +4,13 @@ import 'package:flutter/material.dart';
 class CalendarState {
   final int selectedMonth;
   final int selectedYear;
+  final DateTime selectedDate;
 
-  CalendarState({required this.selectedMonth, required this.selectedYear});
+  CalendarState({
+    required this.selectedMonth,
+    required this.selectedYear,
+    required this.selectedDate,
+  });
 }
 
 class CalendarProvider extends ChangeNotifier {
@@ -18,9 +23,33 @@ class CalendarProvider extends ChangeNotifier {
   final List<int?> _visibleDaySkeleton = [];
   List<int?> get visibleDaySkeleton => List.unmodifiable(_visibleDaySkeleton);
 
+  DateTime _selectedDate = DateTime.now();
+
   CalendarProvider() {
     final now = DateTime.now();
+    _selectedDate = DateTime(now.year, now.month, now.day);
     _setMonthYear(now.year, now.month);
+  }
+
+  DateTime get selectedDate => _selectedDate;
+
+  void selectDate(DateTime date) {
+    final normalized = DateTime(date.year, date.month, date.day);
+    if (_selectedDate == normalized) return;
+    _selectedDate = normalized;
+    final currentState = _state;
+    if (currentState is Success<CalendarState>) {
+      _state = Success(
+        CalendarState(
+          selectedMonth: currentState.data.selectedMonth,
+          selectedYear: currentState.data.selectedYear,
+          selectedDate: normalized,
+        ),
+      );
+      notifyListeners();
+      return;
+    }
+    notifyListeners();
   }
 
   void previousMonth() {
@@ -50,7 +79,13 @@ class CalendarProvider extends ChangeNotifier {
     _visibleDaySkeleton
       ..clear()
       ..addAll(_buildVisibleDaySkeleton(year, month));
-    _state = Success(CalendarState(selectedMonth: month, selectedYear: year));
+    _state = Success(
+      CalendarState(
+        selectedMonth: month,
+        selectedYear: year,
+        selectedDate: _selectedDate,
+      ),
+    );
     notifyListeners();
   }
 

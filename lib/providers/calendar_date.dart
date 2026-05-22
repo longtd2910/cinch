@@ -4,17 +4,21 @@ import 'package:flutter/material.dart';
 
 class CalendarDateState {
   final int? day;
+  final int year;
   final int month;
   final bool isRealDate;
   final bool isToday;
+  final bool isSelected;
   final List<Transaction> dateTransactions;
   final int netAmount;
 
   CalendarDateState({
     required this.day,
+    required this.year,
     required this.month,
     required this.isRealDate,
     required this.isToday,
+    required this.isSelected,
     required this.dateTransactions,
     required this.netAmount,
   });
@@ -29,6 +33,7 @@ class CalendarDateProvider extends ChangeNotifier {
     required int year,
     required int month,
     required List<Transaction> transactions,
+    required DateTime selectedDate,
   }) {
     final dateTransactions =
         _get_date_transactions(day, month, year, transactions);
@@ -37,12 +42,18 @@ class CalendarDateProvider extends ChangeNotifier {
         year == now.year &&
         month == now.month &&
         day == now.day;
+    final isSelected = day != null &&
+        year == selectedDate.year &&
+        month == selectedDate.month &&
+        day == selectedDate.day;
     _state = Success(
       CalendarDateState(
         day: day,
+        year: year,
         month: month,
         isRealDate: day != null,
         isToday: isToday,
+        isSelected: isSelected,
         dateTransactions: dateTransactions,
         netAmount: _netAmount(dateTransactions),
       ),

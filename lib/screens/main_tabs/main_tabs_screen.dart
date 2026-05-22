@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:cinch/screens/add_transaction/add_transaction_screen.dart';
+import 'package:cinch/screens/calendar/calendar_day_screen.dart';
 import 'package:cinch/screens/calendar/calendar_screen.dart';
 import 'package:cinch/screens/settings/settings_screen.dart';
 import 'package:cinch/screens/transactions/transactions_screen.dart';
@@ -20,13 +21,15 @@ class _MainTabsScreenState extends State<MainTabsScreen> {
   static const List<Widget> _screens = <Widget>[
     CalendarScreen(),
     TransactionsScreen(),
+    CalendarDayScreen(),
     SettingsScreen(),
   ];
 
   int get _screenIndex => switch (_currentNavIndex) {
     0 => 0,
     1 => 1,
-    4 => 2,
+    3 => 2,
+    4 => 3,
     _ => 0,
   };
 
@@ -102,8 +105,8 @@ class _BottomNavBar extends StatelessWidget {
               onLongPress: onCenterLongPress,
             ),
             _NavIcon(
-              icon: Icons.grid_view_outlined,
-              selectedIcon: Icons.grid_view_rounded,
+              icon: Icons.photo_library_outlined,
+              selectedIcon: Icons.photo_library,
               isSelected: currentIndex == 3,
               onTap: () => onTap(3),
             ),
