@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Flutter Deployment Guide — Transaction Classifier</title>
+</head>
+<body>
+  <h1>Flutter Deployment Guide</h1>
+  <p>Deploy the transaction classifier ONNX model in a Flutter app using <code>onnxruntime_flutter</code>.</p>
+
+  <h2>Model Artifact</h2>
+  <table border="1" cellpadding="6" cellspacing="0">
+    <tr><th>File</th><td><code>artifacts/models/teacher.onnx</code></td></tr>
+    <tr><th>Backbone</th><td>EfficientNet-B2</td></tr>
+    <tr><th>Size</th><td>29.3 MB (FP32)</td></tr>
+    <tr><th>Input</th><td><code>image</code>: float32 tensor [1, 3, 320, 320] (CHW, normalized)</td></tr>
+    <tr><th>Output</th><td><code>logit</code>: float32 [1, 1] → apply sigmoid for probability</td></tr>
+    <tr><th>Threshold</th><td>0.967 (best F1) or 0.5 (high-recall mode)</td></tr>
+    <tr><th>Normalization</th><td>mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]</td></tr>
+  </table>
+
+  <h2>1. Add Dependencies</h2>
+  <pre><code># pubspec.yaml
+dependencies:
+  onnxruntime_flutter: ^latest
+  image: ^latest</code></pre>
+
+  <h2>2. Place Model Asset</h2>
+  <pre><code># pubspec.yaml
+flutter:
+  assets:
+    - assets/models/teacher.onnx</code></pre>
+  <p>Copy <code>artifacts/models/teacher.onnx</code> into your Flutter project at <code>assets/models/teacher.onnx</code>.</p>
+
+  <h2>3. Inference Code</h2>
+  <pre><code>import 'dart:math';
+import 'dart:typed_data';
+import 'package:image/image.dart' as img;
+import 'package:onnxruntime_flutter/onnxruntime_flutter.dart';
+
+class TransactionClassifier {
+  static const int inputSize = 320;
+  static const List&lt;double&gt; mean = [0.485, 0.456, 0.406];
+  static const List&lt;double&gt; std = [0.229, 0.224, 0.225];
+  static const double threshold = 0.967;
+
+  late OrtSession _session;
+
+  Future&lt;void&gt; init() async {
+    final options = OrtSessionOptions();
+    _session = await OrtSession.fromAsset('assets/models/teacher.onnx', options);
+  }
+
+  Future&lt;Map&lt;String, dynamic&gt;&gt; classify(img.Image image) async {
+    final resized = img.copyResize(image, width: inputSize, height: inputSize);
+    final input = _preprocess(resized);
+    final feeds = {'image': OrtValue.fromList(input, [1, 3, inputSize, inputSize])};
+    final results = await _session.run(feeds);
+    final logit = (results['logit']!.value as List&lt;List&lt;double&gt;&gt;)[0][0];
+    final probability = 1.0 / (1.0 + exp(-logit));
+    return {
+      'is_transaction': probability >= threshold,
+      'confidence': probability,
+    };
+  }
+
+  Float32List _preprocess(img.Image image) {
+    final buffer = Float32List(3 * inputSize * inputSize);
+    for (int y = 0; y &lt; inputSize; y++) {
+      for (int x = 0; x &lt; inputSize; x++) {
+        final pixel = image.getPixel(x, y);
+        final idx = y * inputSize + x;
+        buffer[0 * inputSize * inputSize + idx] = (pixel.r / 255.0 - mean[0]) / std[0];
+        buffer[1 * inputSize * inputSize + idx] = (pixel.g / 255.0 - mean[1]) / std[1];
+        buffer[2 * inputSize * inputSize + idx] = (pixel.b / 255.0 - mean[2]) / std[2];
+      }
+    }
+    return buffer;
+  }
+
+  void dispose() {
+    _session.close();
+  }
+}</code></pre>
+
+  <h2>4. Usage Example</h2>
+  <pre><code>final classifier = TransactionClassifier();
+await classifier.init();
+
+// From camera or gallery
+final imageBytes = await File(pickedPath).readAsBytes();
+final image = img.decodeImage(imageBytes)!;
+final result = await classifier.classify(image);
+
+if (result['is_transaction']) {
+  // Handle transaction image (confidence: ${result['confidence']})
+} else {
+  // Not a transaction
+}
+
+classifier.dispose();</code></pre>
+
+  <h2>5. Platform Notes</h2>
+  <ul>
+    <li><strong>Android:</strong> ONNX Runtime uses NNAPI delegate automatically on supported devices for hardware acceleration.</li>
+    <li><strong>iOS:</strong> ONNX Runtime uses CoreML delegate for GPU/Neural Engine acceleration.</li>
+    <li><strong>Model size:</strong> 29.3 MB adds to app bundle. Consider downloading on first launch if app size is critical.</li>
+    <li><strong>Expected latency:</strong> 20–40ms on mid-range phones (2023+), 10–20ms on flagships.</li>
+    <li><strong>Memory:</strong> ~60–80 MB peak during inference.</li>
+  </ul>
+
+  <h2>6. Threshold Tuning</h2>
+  <ul>
+    <li><strong>High-recall mode (0.5):</strong> catches 94% of transactions but flags some false positives (52% precision).</li>
+    <li><strong>Balanced mode (0.967):</strong> best F1=0.74, good balance of precision and recall.</li>
+    <li>Adjust threshold based on UX — if the app auto-categorizes, use high threshold; if it just suggests, use low threshold.</li>
+  </ul>
+</body>
+</html>

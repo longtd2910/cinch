@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dev Notes — Transaction Detection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f7f4ef;
+      --surface: #ffffff;
+      --surface-muted: #f3eee7;
+      --border: #e4ddd4;
+      --text: #1e1b18;
+      --text-muted: #8e857c;
+      --primary: #c8a97e;
+      --primary-dim: #ead8b7;
+      --accent: #5e9f7a;
+      --accent-bg: #d8e9de;
+      --warn: #b36b5e;
+      --shadow: 0 4px 24px rgba(45, 32, 20, 0.08);
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Nunito", system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse 80% 50% at 100% 0%, rgba(200, 169, 126, 0.18), transparent),
+        radial-gradient(ellipse 60% 40% at 0% 100%, rgba(94, 159, 122, 0.12), transparent),
+        var(--bg);
+    }
+
+    .wrap {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 4rem;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-bg);
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      margin: 0 0 0.5rem;
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .lede {
+      margin: 0;
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 52ch;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+    }
+
+    .stat {
+      flex: 1 1 140px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.2;
+    }
+
+    .stat span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.35rem 1.35rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    section h2 {
+      margin: 0 0 1rem;
+      font-size: 1.1rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    section h2 .icon {
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .done h2 .icon { background: var(--accent-bg); color: var(--accent); }
+    .flow h2 .icon { background: var(--primary-dim); color: var(--text); }
+    .bg h2 .icon { background: #ece5db; color: var(--text-muted); }
+    .todo h2 .icon { background: #f5e8e5; color: var(--warn); }
+
+    ul, ol {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .item {
+      position: relative;
+      padding: 0.65rem 0 0.65rem 1.75rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .item:first-child { border-top: none; padding-top: 0; }
+    .item:last-child { padding-bottom: 0; }
+
+    .item::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.95rem;
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .todo .item::before {
+      background: transparent;
+      border: 2px solid var(--border);
+      width: 0.5rem;
+      height: 0.5rem;
+    }
+
+    .item strong { color: var(--text); font-weight: 700; }
+
+    code {
+      font-family: ui-monospace, "Cascadia Code", "Consolas", monospace;
+      font-size: 0.82em;
+      background: var(--surface-muted);
+      color: #3f7358;
+      padding: 0.12em 0.4em;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .flow ol { counter-reset: step; }
+
+    .flow .item {
+      counter-increment: step;
+      padding-left: 2.5rem;
+    }
+
+    .flow .item::before {
+      content: counter(step);
+      width: 1.5rem;
+      height: 1.5rem;
+      top: 0.55rem;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--text);
+      font-size: 0.75rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1816;
+        --surface: #24211e;
+        --surface-muted: #2e2a26;
+        --border: #3d3832;
+        --text: #f7f4ef;
+        --text-muted: #a89f94;
+        --primary: #d4b88a;
+        --primary-dim: #3d3528;
+        --accent: #6bb088;
+        --accent-bg: #2a3d32;
+        --shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+      }
+      code { color: #8fd4ad; border-color: var(--border); }
+      .bg h2 .icon { background: #2e2a26; }
+      .todo h2 .icon { background: #3d2e2a; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow">Cinch · Dev notes</div>
+      <h1>Transaction Detection</h1>
+      <p class="lede">ONNX-based photo scanning to auto-detect transaction images from today's gallery photos.</p>
+      <div class="stats">
+        <div class="stat"><strong>13</strong><span>components shipped</span></div>
+        <div class="stat"><strong>5</strong><span>steps in user flow</span></div>
+        <div class="stat"><strong>3</strong><span>items on backlog</span></div>
+      </div>
+    </header>
+
+    <section class="done">
+      <h2><span class="icon">✓</span> What was done</h2>
+      <ul>
+        <li class="item"><strong>Dependencies added:</strong> <code>onnxruntime_v2</code>, <code>image</code>, <code>photo_manager</code>, <code>workmanager</code></li>
+        <li class="item"><strong>Model asset:</strong> <code>assets/models/teacher.onnx</code> registered in pubspec.yaml</li>
+        <li class="item"><strong>TransactionClassifier</strong> (<code>lib/core/services/transaction_classifier.dart</code>): ONNX inference wrapper using EfficientNet-B2, threshold 0.5 (high-recall mode for suggestions)</li>
+        <li class="item"><strong>PhotoScannerService</strong> (<code>lib/core/services/photo_scanner_service.dart</code>): Fetches photos for a date from device gallery via photo_manager, runs each through classifier</li>
+        <li class="item"><strong>DetectionResult model</strong> (<code>lib/core/models/detection_result.dart</code>): Holds AssetEntity + confidence score</li>
+        <li class="item"><strong>DetectionProvider</strong> (<code>lib/providers/detection.dart</code>): Resumable state management — supports pause/resume, streams results as they're found, caches processed photo IDs so scanning continues from where it left off</li>
+        <li class="item"><strong>TodayDetectionScreen</strong> (<code>lib/screens/today/today_detection_screen.dart</code>): Replaced the old Transactions tab. Compact approval card layout — 72px thumbnail, time, confidence badge, approve/dismiss actions. Swipe-to-dismiss. Scanning auto-starts when tab is active, pauses when leaving</li>
+        <li class="item"><strong>DetectionResultsScreen</strong> (<code>lib/screens/detection/detection_results_screen.dart</code>): Full-screen view for the settings test button (custom date scanning)</li>
+        <li class="item"><strong>Settings screen:</strong> Date picker + scan button for testing, daily schedule toggle + time picker</li>
+        <li class="item"><strong>Tab lifecycle:</strong> MainTabsScreen pauses detection on tab-away, resumes on tab-return. IndexedStack keeps widget alive</li>
+      </ul>
+    </section>
+
+    <section class="flow">
+      <h2><span class="icon">→</span> Today Tab Flow</h2>
+      <ol>
+        <li class="item">User taps the second tab (sparkle icon)</li>
+        <li class="item">Detection starts automatically for today's photos</li>
+        <li class="item">Results stream in as compact tiles while scanning continues</li>
+        <li class="item">User swipes left to dismiss, taps check to approve a detection</li>
+        <li class="item">Navigating away pauses scanning — returning resumes from cache</li>
+      </ol>
+    </section>
+
+    <section class="bg">
+      <h2><span class="icon">⏱</span> Daily Background Scan Job</h2>
+      <ul>
+        <li class="item"><strong>workmanager</strong> package added for cross-platform background task scheduling</li>
+        <li class="item"><strong>ScanScheduleService</strong> (<code>lib/core/services/scan_schedule_service.dart</code>): Hive-backed settings for enabled/disabled state and scheduled time (default 10:00 PM). Registers/cancels WorkManager periodic task with correct initial delay calculation</li>
+        <li class="item"><strong>Background callback</strong> (<code>lib/core/services/background_scan.dart</code>): Top-level entry point that loads the ONNX model, scans today's photos, and stores detected results in a <code>scan_results</code> Hive box</li>
+        <li class="item"><strong>Settings UI</strong>: Toggle to enable/disable daily scan + time picker to adjust schedule</li>
+        <li class="item"><strong>Platform setup</strong>: iOS <code>BGTaskSchedulerPermittedIdentifiers</code> in Info.plist, Android <code>READ_MEDIA_IMAGES</code> permission in AndroidManifest</li>
+      </ul>
+    </section>
+
+    <section class="done">
+      <h2><span class="icon">✓</span> Preprocessing — Letterbox</h2>
+      <ul>
+        <li class="item"><strong>Pipeline:</strong> scale longest side to 320 (aspect ratio preserved) → pad to 320×320 with ImageNet mean RGB (124, 116, 104) → normalize → CHW tensor</li>
+        <li class="item"><strong>No crop:</strong> full screenshot content retained; matches training <code>get_eval_transforms</code> letterbox</li>
+      </ul>
+    </section>
+
+    <section class="todo">
+      <h2><span class="icon">◇</span> TODO / Next steps</h2>
+      <ul>
+        <li class="item">Wire approve action to AddTransactionScreen with pre-filled image</li>
+        <li class="item">Add local notifications when daily scan finds transactions</li>
+        <li class="item">Consider running inference in isolate for smoother UI</li>
+      </ul>
+    </section>
+
+    <footer>Last updated · Transaction detection feature</footer>
+  </div>
+</body>
+</html>

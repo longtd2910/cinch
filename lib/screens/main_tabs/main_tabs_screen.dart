@@ -1,10 +1,12 @@
+import 'package:cinch/providers/detection.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:cinch/screens/add_transaction/add_transaction_screen.dart';
 import 'package:cinch/screens/calendar/calendar_day_screen.dart';
 import 'package:cinch/screens/calendar/calendar_screen.dart';
 import 'package:cinch/screens/settings/settings_screen.dart';
-import 'package:cinch/screens/transactions/transactions_screen.dart';
+import 'package:cinch/screens/today/today_detection_screen.dart';
 
 class MainTabsScreen extends StatefulWidget {
   const MainTabsScreen({super.key});
@@ -15,12 +17,13 @@ class MainTabsScreen extends StatefulWidget {
 
 class _MainTabsScreenState extends State<MainTabsScreen> {
   static const _addNavIndex = 2;
+  static const _todayNavIndex = 1;
 
   int _currentNavIndex = 0;
 
   static const List<Widget> _screens = <Widget>[
     CalendarScreen(),
-    TransactionsScreen(),
+    TodayDetectionScreen(),
     CalendarDayScreen(),
     SettingsScreen(),
   ];
@@ -39,7 +42,17 @@ class _MainTabsScreenState extends State<MainTabsScreen> {
       return;
     }
     if (index == _currentNavIndex) return;
+
+    final previousIndex = _currentNavIndex;
     setState(() => _currentNavIndex = index);
+
+    final detection = context.read<DetectionProvider>();
+    if (previousIndex == _todayNavIndex && index != _todayNavIndex) {
+      detection.pause();
+    }
+    if (index == _todayNavIndex && previousIndex != _todayNavIndex) {
+      detection.startOrResume();
+    }
   }
 
   Future<void> _onAddLongPress() async {
@@ -95,8 +108,8 @@ class _BottomNavBar extends StatelessWidget {
               onTap: () => onTap(0),
             ),
             _NavIcon(
-              icon: Icons.bar_chart_rounded,
-              selectedIcon: Icons.bar_chart_rounded,
+              icon: Icons.auto_awesome_outlined,
+              selectedIcon: Icons.auto_awesome,
               isSelected: currentIndex == 1,
               onTap: () => onTap(1),
             ),

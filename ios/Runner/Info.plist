@@ -47,6 +47,12 @@
 			</array>
 		</dict>
 	</dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.cinch.dailyPhotoScan</string>
+	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Cinch needs access to your photos to detect transaction receipts.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

@@ -14,11 +14,15 @@ dependencies:
   google_fonts: ^8.1.0
   hive_ce: ^2.19.3
   hive_ce_flutter: ^2.3.4
+  image: ^4.8.0
   image_picker: ^1.2.2
   m3e_design: ^0.2.1
   navigation_bar_m3e: ^0.1.1
+  onnxruntime_v2: ^1.23.2+2
   path_provider: ^2.1.5
+  photo_manager: ^3.9.0
   provider: ^6.1.5+1
+  workmanager: ^0.9.0+3
 
 dev_dependencies:
   flutter_test:
@@ -27,3 +31,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/models/teacher.onnx
